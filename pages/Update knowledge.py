@@ -7,16 +7,15 @@ import pdfplumber
 import docx2txt
 import pandas as pd
 from streamlit_js_eval import streamlit_js_eval
+import os
 
 def refresh():
     Server.get_current()._reloader.reload()
 
-
-client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet",
-                                    persist_directory="C:/Users/002H26744/Desktop/collection"
-                                ))
-
+current_directory = os.getcwd()
+client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet",persist_directory=f"{current_directory}/collection"))
 collection=client.get_collection("my_collection")
+#collection=client.create_collection("my_collection")
 
 #Extracting text functions
 def extract_text_from_excel(file_path):
