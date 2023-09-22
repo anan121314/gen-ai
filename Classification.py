@@ -86,21 +86,22 @@ def count_occurence(chunks,params):
 def copy_file_default(percent_match,file):
     if file is not None:
         file_name=file.name
+        current_directory = os.getcwd()
         try:
             if percent_match>=75:
-                os.makedirs("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_75-100%\\", exist_ok=True)
-                destination_path = os.path.join("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_75-100%\\", file_name)
+                os.makedirs(f"{current_directory}\\relevant_75-100%\\", exist_ok=True)
+                destination_path = os.path.join(f"{current_directory}\\relevant_75-100%\\", file_name)
             elif percent_match < 75 and percent_match >= 50:
-                os.makedirs("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_50-75%\\", exist_ok=True)
-                destination_path = os.path.join("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_50-75%\\", file_name)
+                os.makedirs(f"{current_directory}\\relevant_50-75%\\", exist_ok=True)
+                destination_path = os.path.join(f"{current_directory}\\relevant_50-75%\\", file_name)
             elif percent_match < 50 and percent_match >= 25:
-                os.makedirs("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_25-50%\\", exist_ok=True)
-                destination_path = os.path.join("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_25-50%\\", file_name)
+                os.makedirs(f"{current_directory}\\relevant_25-50%\\", exist_ok=True)
+                destination_path = os.path.join(f"{current_directory}\\relevant_25-50%\\", file_name)
             elif percent_match < 25 and percent_match >= 10:
-                os.makedirs("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_10-25%\\", exist_ok=True)
-                destination_path = os.path.join("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_10-25%\\", file_name)
+                os.makedirs(f"{current_directory}\\relevant_10-25%\\", exist_ok=True)
+                destination_path = os.path.join(f"{current_directory}\\relevant_10-25%\\", file_name)
             else:
-                os.makedirs("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_0-10%\\", exist_ok=True)
+                os.makedirs(f"{current_directory}\\relevant_0-10%\\", exist_ok=True)
                 destination_path = os.path.join("C:\\Users\\002H26744\\Desktop\\relevant_files\\relevant_0-10%\\", file_name)
  
             # Copy the file to the destination

@@ -11,22 +11,22 @@ from chromadb.config import Settings
 
 creds = Credentials("pak-4D7V0iz9n86tsi2BH48ezpshf0mmxTnnPnvHl2dJatw", api_endpoint="https://bam-api.res.ibm.com/v1")
 
-alice_params = GenerateParams(decoding_method="greedy", max_new_tokens=250, temperature=0.1)
-alice = Model("meta-llama/llama-2-70b-chat", params=alice_params, credentials=creds)
+def generateparams(decoding,token,temp,model,creds):
+    model_param=GenerateParams(decoding_method=decoding, max_new_tokens=token, temperature=temp)
+    output = Model(model, params=model_param, credentials=creds)
+    print(model,model_param)
+    return output
+#alice = Model("meta-llama/llama-2-70b-chat", params=alice_params, credentials=creds)
+#alice = Model("google/flan-ul2", params=alice_params, credentials=creds)
 
-client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet",
-                                    persist_directory="/content/"
-                                ))
+# current_directory = os.getcwd()
+# client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet",persist_directory=f"{current_directory}/collection"))
+# collection=client.get_collection("my_collection")
 
-collection=client.get_collection("my_information")
 
-def make_prompt(context, question_text):
-   return (f"""Strictly follow the instructions below
-               1. Provide an answer based only on the information provided.
-               2. If the answer is not in the information provided reply "No information available".
-               3. For answer containing list of items. Reply as bullet points.
-               4. Do not add any text mentionin "information provided" in the answer text.\n"""
-          + f"Information :\n{context}.\n\n"
+def make_prompt(instruction, context, question_text):
+   return (f"""{instruction}\n"""
+          + f"Information :\n{context}.\n"
           + f"{question_text}?\n")
 
 def process_text(text):
@@ -37,21 +37,33 @@ def process_text(text):
 )
     return results
 
-def generate_answer(relevant,text):
+def generate_answer(alice,instruction,relevant,text):
     context = '. '.join(relevant)
-    prompt_text = make_prompt(context, text)
-    lines=prompt_text.replace('/n','. ')
-    alice_response = alice.generate([lines])   
+    prompt_text = make_prompt(instruction,context, text)
+    lines=prompt_text
+    print(lines)
+    alice_response = alice.generate([lines])
     alice_gen = alice_response[0].generated_text
     print(f"Watson : \n{alice_gen}")
     return alice_gen
 
+model_options=['meta-llama/llama-2-70b-chat','google/flan-ul2',]
+model=st.selectbox('Select model:', model_options)
+options = ['sample', 'greedy']
+decoding = st.selectbox('Select decoding:', options)
+token=st.number_input('Enter maximum token:', min_value=10, step=1,value=100)
+temp=st.slider('Select temperature:', min_value=0.001, max_value=1.0001,step=0.1, value=0.2)
+alice=generateparams(decoding,token,temp,model,creds)
+instruction=st.text_area("Enter instruction here", "")
 query=st.text_input("Enter your query.")
 if query:
+    current_directory = os.getcwd()
+    client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet",persist_directory=f"{current_directory}/collection"))
+    collection=client.get_collection("my_collection")
     result=process_text(query)
     relevant_texts=result["documents"][0]
     sources=result["metadatas"][0]
-    answer=generate_answer(relevant_texts,query)
+    answer=generate_answer(alice,instruction,relevant_texts,query)
     st.write(answer)
     st.info('Below are the relevant portions of document from which the answer is generated. Expand each to view the relevant portions.')
     k=0
